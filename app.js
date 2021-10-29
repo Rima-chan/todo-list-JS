@@ -29,7 +29,7 @@ form.addEventListener('submit', e => {
     const input = document.querySelector('#input');
     console.log(input.value)
     const text = input.value;
-    const isUrgent = document.querySelector('#important').value;
+    const isUrgent = false;
     if (text != "") {
         addTodo(text, isUrgent);
         input.value = "";
