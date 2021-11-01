@@ -14,9 +14,9 @@ class Todo {
 let todoList = [];
 
 document.addEventListener('DOMContentLoaded', () => {
-    const ref = localStorage.getItem('todoList');
-    if (ref) {
-        todoList = JSON.parse(ref);
+    const todos = localStorage.getItem('todoList');
+    if (todos) {
+        todoList = JSON.parse(todos);
         todoList.forEach(todo => {
             displayTodo(todo);
         });
@@ -25,11 +25,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
 form.addEventListener('submit', e => {
     e.preventDefault();
-    console.log(e)
     const input = document.querySelector('#input');
-    console.log(input.value)
+    const urgent = document.querySelector('#important');
     const text = input.value;
-    const isUrgent = false;
+    const isUrgent = urgent.checked;
+    console.log(urgent.checked)
+    
     if (text != "") {
         addTodo(text, isUrgent);
         input.value = "";
@@ -59,29 +60,29 @@ function addTodo(text, prio) {
 }
 
 function displayTodo(todo) {
+    console.log(todoList);
     localStorage.setItem('todoList', JSON.stringify(todoList));
     const list = document.querySelector('#list');
-    const item = document.querySelector(`[data-key='${todo.id}']`); 
-    console.log(item);
-    console.log(todo)
-    if (todo.isDeleted) {
+    const item = document.querySelector(`[data-key='${todo.id}']`);
+    if (todo && todo.isDeleted) {
         item.remove();
         return;
     }
 
     const isComplete = todo.isComplete ? ' text-gray-600 line-through' : '';
     const checkBtn = todo.isComplete ? 'fa-times' : 'fa-check';
+    const isUrgent = todo.isUrgent ? ' font-bold text-red-600' : '';
     const node = document.createElement('li');
     node.setAttribute('class', 'inline-flex justify-between w-full bg-gray-50 shadow-lg rounded py-2 pl-3 my-3');
     node.setAttribute('data-key', todo.id);
     node.innerHTML = `
-            <span class="font-semibold ${isComplete}">${todo.text} </span>
-            <span class="pr-3">
-                <button class="cursor-pointer pr-3" type="button" id="trashBtn" value="trash" aria-label="Supprimer la tâche">
-                    <i class="fas fa-trash-alt " data-button="trash" ></i>
+            <span class="font-semibold ${isComplete} self-center ${isUrgent}">${todo.text} </span>
+            <span class="inline-flex pr-3 w-1/5">
+                <button class="w-1/2 hover:text-purple-600 transition-colors duration-100 ease-in" type="button" id="trashBtn" value="trash" aria-label="Supprimer la tâche">
+                    <i class="fas fa-trash-alt cursor-pointer" data-button="trash" ></i>
                 </button>
-                <button class="cursor-pointer" type="button" id="checkBtn" value="check" aria-label="Tâche terminée">
-                    <i class="fas ${checkBtn} fa-lg" data-button="check" ></i>
+                <button class="w-1/2 hover:text-purple-600 transition-colors duration-100 ease-in" type="button" id="checkBtn" value="check" aria-label="Tâche terminée">
+                    <i class="fas ${checkBtn} fa-lg cursor-pointer" data-button="check" ></i>
                 </button> 
             </span>
         `;
@@ -102,65 +103,8 @@ function toggleDone(key) {
 
 function deleteTodo(key) {
     const index = todoList.findIndex(item => item.id === Number(key));
-    console.log(index);
     todoList[index].isDeleted = true;
-    displayTodo(todoList[index]);
+    const todo = todoList[index];
     todoList = todoList.filter(item => item.id != Number(key));
+    displayTodo(todo);
 }
-
-// function updateTodo(e) {
-    
-//     const button = e.target.dataset.button;
-//     console.log(button)
-//     const li = e.target.closest('li');
-//     const id = parseInt(li.getAttribute('id'), 10);
-//     const todo = todoList.filter(element => element.id === id);
-//     const textId = `text-${id}`;
-//     const text = document.querySelector(`[data-text=${textId}]`);
-//     console.log(todo)
-//     if (button === 'check') {
-//         todo[0].isComplete = !todo[0].isComplete;
-//         e.target.classList.toggle("fa-check");
-//         e.target.classList.toggle("fa-times");
-//         text.classList.toggle("text-gray-600");
-//         text.classList.toggle("line-through");
-//         saveToLocalStorage(todo);
-//     }
-// }
-
-
-// function saveToLocalStorage(todo) {
-//     let list = getTodoList();
-//     list = list.filter(element => element.id !== todo.id);
-//     list.push(todo);
-//     localStorage.setItem('todoList', JSON.stringify(list));
-// }
-
-// function getTodoList() {
-//     let todoList = localStorage.getItem('todoList');
-//     if (todoList === null) {
-//         return [];
-//     } else {
-//         return JSON.parse(todoList);
-//     }
-// }
-
-// function displayTodoList() {
-//     const todoList = getTodoList();
-//     todoList.forEach(element => {
-//         const todo = new Todo(element.text, element.id, element.isComplete, element.isUrgent);
-//         const checkedClass = element.isComplete ? " text-gray-600 line-through" : "";
-//         const template = `<li class="inline-flex justify-between w-full bg-gray-50 shadow-lg rounded py-2 pl-3 my-3" data-id="${todo.id}" id="${todo.id}"">
-//                             <span class="font-semibold ${checkedClass}" data-text="text-${todo.id}"> ${todo.text} </span>
-//                             <span class="pr-3">
-//                                 <button class="cursor-pointer pr-3" type="button" name="trashBtn" value="trash" aria-label="Supprimer la tâche">
-//                                     <i class="fas fa-trash-alt " data-button="trash"></i>
-//                                 </button>
-//                                 <button class="cursor-pointer" type="button" name="checkBtn" value="check" aria-label="Tâche terminée">
-//                                     <i class="fas fa-check fa-lg" data-button="check"></i>
-//                                 </button> 
-//                             </span>
-//                             </li>`;
-//         list.insertAdjacentHTML('afterbegin', template);
-//     });
-// }
